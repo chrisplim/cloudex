@@ -60,6 +60,15 @@ defmodule CloudexTest do
     end
   end
 
+  test "upload data uri" do
+    use_cassette "test_upload_url with data uri" do
+      assert {:ok, %Cloudex.UploadedImage{}} =
+               Cloudex.upload(
+                 "data:image/bmp;base64,Qk1xAAAAAAAAAHsAAABsAAAAAQAAAAEAAAABACAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAD/AAD/AAAAAAAA/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=="
+               )
+    end
+  end
+
   test "mixed files / urls" do
     use_cassette "test_upload_mixed" do
       assert [
@@ -131,8 +140,8 @@ defmodule CloudexTest do
                  {:ok, %Cloudex.UploadedImage{}}
                ] =
                  Cloudex.upload_list_with_options([
-                   %{image_resource: "./test/assets/test.jpg", options: %{public_id: "foo"}},
-                   %{image_resource: "nonexistent.png", options: %{public_id: "bar"}},
+                   %{image_resource: "./test/assets/test.jpg", public_id: "foo"},
+                   %{image_resource: "nonexistent.png", public_id: "bar"},
                    %{
                      image_resource:
                        "https://cdn.mhpbooks.com/uploads/2014/10/shutterstock_172896005.jpg"

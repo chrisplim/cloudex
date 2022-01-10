@@ -54,12 +54,12 @@ defmodule Cloudex do
   @spec upload_list_with_options(list(map), map) :: upload_result
   def upload_list_with_options(list, default_options \\ %{}) do
     list
-    |> Enum.map(fn %{url: url} = item ->
-      item_specific_options = Map.drop(item, :url)
+    |> Enum.map(fn %{image_resource: image_resource} = item ->
+      item_specific_options = Map.drop(item, [:image_resource])
       options = Map.merge(default_options, item_specific_options)
 
       Task.async(fn ->
-        case sanitize_list(url) do
+        case sanitize_list(image_resource) do
           [{:ok, sanitized_resource}] ->
             Cloudex.CloudinaryApi.upload(sanitized_resource, options)
 
@@ -102,7 +102,9 @@ defmodule Cloudex do
 
   defp sanitize_list([item | tail], sanitized_list) do
     result =
-      if Regex.match?(~r/^(http|s3)/, item), do: {:ok, item}, else: handle_file_or_directory(item)
+      if Regex.match?(~r/^(http|s3|data)/, item),
+        do: {:ok, item},
+        else: handle_file_or_directory(item)
 
     new_list = [result | sanitized_list]
     sanitize_list(tail, new_list)
