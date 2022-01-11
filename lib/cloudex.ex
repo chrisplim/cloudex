@@ -48,18 +48,18 @@ defmodule Cloudex do
   end
 
   @doc """
-  Upload a list of maps, containing an :image_resource and any item specific :options, which
+  Upload a list of maps, containing a :resource and any item specific :options, which
   will be merged with the :default_options.
   """
   @spec upload_list_with_options(list(map), map) :: upload_result
   def upload_list_with_options(list, default_options \\ %{}) do
     list
-    |> Enum.map(fn %{image_resource: image_resource} = item ->
-      item_specific_options = Map.drop(item, [:image_resource])
+    |> Enum.map(fn %{resource: resource} = item ->
+      item_specific_options = Map.drop(item, [:resource])
       options = Map.merge(default_options, item_specific_options)
 
       Task.async(fn ->
-        case sanitize_list(image_resource) do
+        case sanitize_list(resource) do
           [{:ok, sanitized_resource}] ->
             Cloudex.CloudinaryApi.upload(sanitized_resource, options)
 
